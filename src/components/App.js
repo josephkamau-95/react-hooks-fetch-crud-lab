@@ -8,16 +8,39 @@ function App() {
   const [questions, setQuestions] = useState([])
 
   useEffect(() => {
-    fetch("http://localhost:4000/questions")
-      .then((response) => response.json())
-      .then((data) => setQuestions(data))
-      .catch((err) => console.error("Error fetching questions:", err));
+      fetch("http://localhost:4000/questions")
+        .then((res) => res.json())
+        .then((questions) => setQuestions(questions));
   }, [])
+
+  const handleAddQuestion = (newQuestion) => {
+    setQuestions([...questions, newQuestion]);
+  }
+
+  const handleDeleteQuestion = (id) => {
+    setQuestions(questions.filter((question) => question.id !== id));
+  };
+
+  const handleUpdateQuestion = (updatedQuestion) => {
+    setQuestions(
+      questions.map((question) => 
+        question.id === updatedQuestion.id ? updatedQuestion : question
+      )
+    );
+  }
 
   return (
     <main>
       <AdminNavBar onChangePage={setPage} />
-      {page === "Form" ? <QuestionForm setQuestions={setQuestions} /> : <QuestionList questions={questions} setQuestions={setQuestions} />}
+      {page === "Form" ? (
+        <QuestionForm onAddQuestion={handleAddQuestion} /> 
+      ) : ( 
+        <QuestionList 
+        onUpdateQuestion={handleUpdateQuestion}
+        onDeleteQuestion={handleDeleteQuestion}
+        questions={questions}
+        />
+      )}
     </main>
   );
 }

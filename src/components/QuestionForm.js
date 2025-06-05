@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function QuestionForm({ setQuestions }) {
+function QuestionForm({ onAddQuestion }) {
   const [formData, setFormData] = useState({
     prompt: "",
     answer1: "",
@@ -19,36 +19,38 @@ function QuestionForm({ setQuestions }) {
 
   function handleSubmit(event) {
     event.preventDefault();
-    const { prompt, answer1, answer2, answer3, answer4, correctIndex } = formData;
-    const newQuestion = {
-      prompt,
-      answers: [answer1, answer2, answer3, answer4],
-      correctIndex: parseInt(correctIndex, 10),
+    const questionData = {
+      prompt: formData.prompt,
+      answers: [
+        formData.answer1,
+        formData.answer2,
+        formData.answer3,
+        formData.answer4,
+      ],
+      correctIndex: parseInt(formData.correctIndex),
     };
-  
-
     fetch("http://localhost:4000/questions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newQuestion),
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(questionData),
     })
-      .then((res) => res.json())
-      .then((addedQuestion) => {
-        setQuestions((prev) => [...prev, addedQuestion]);
-        // Reset form data after submission
-        setFormData({
-          prompt: "",
-          answer1: "",
-          answer2: "",
-          answer3: "",
-          answer4: "",
-          correctIndex: "0",
-        });
-      })
-      .catch((err) => console.error("Error adding question:", err))
+    .then((res) => res.json())
+    .then((newQuestion) => {
+      onAddQuestion(newQuestion);
+      // Reset form data after submission
+      setFormData({
+        prompt: "",
+        answer1: "",
+        answer2: "",
+        answer3: "",
+        answer4: "",
+        correctIndex: "0",
+      });
+    });
   }
+
 
   return (
     <section>
